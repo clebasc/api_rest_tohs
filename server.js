@@ -22,10 +22,27 @@ router.get("/",function(req,res){
 //route() will allow you to use same path for different HTTP operation.
 //So if you have same URL but with different HTTP OP such as POST,GET etc
 //Then use route() to remove redundant code.
+router.route("/heroes/find/:name")
+    .get(function(req, res){
+        console.log(req.params.name);
+        var query = req.params.name+".*";
+        console.log(query);
+        mongoOp.find({nom: new RegExp(query)}, function(err, data){
+            if(err){
+                response = {"error" : true,"message" : "Error search service"};
+            } else {
+                console.log(data);
+                response = {"error" : false, "message" : data}
+                res.json(response);
+            }
+        });
+    });
+
 
 router.route("/heroes")
     .get(function(req,res){
         var response = {};
+        console.log(req.params.name);
         mongoOp.find({},function(err,data){
         // Mongo command to fetch all data from collection.
             if(err) {
@@ -104,13 +121,13 @@ router.route("/heroes/:id")
                     if(err) {
                         response = {"error" : true,"message" : "Error deleting data"};
                     } else {
-                        response = {"error" : true,"message" : "Data associated with "+req.params.id+"is deleted"};
+                        response = {"error" : false,"message" : "Data associated with "+req.params.id+"is deleted"};
                     }
                     res.json(response);
                 });
             }
         });
-    })
+    });
 
 app.use('/',router);
 
